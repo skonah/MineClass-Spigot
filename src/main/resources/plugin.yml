@@ -1,0 +1,9 @@
+name: Mineclass
+version: @version@
+main: net.babamod.mineclass.Mineclass
+api-version: 1.16
+authors: [ Barazok ]
+commands:
+  class:
+    description: The class choosing command
+    usage: /<command>
