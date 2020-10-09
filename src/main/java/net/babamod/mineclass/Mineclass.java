@@ -11,19 +11,21 @@ import java.util.Arrays;
 
 public final class Mineclass extends JavaPlugin implements Listener {
 
-    @Override
-    public void onEnable() {
-        AppliedStatus.getInstance();
-        new MineClassListeners(this);
-        PluginCommand pluginCommand = this.getCommand("class");
-        if (pluginCommand != null) {
-            pluginCommand.setTabCompleter((sender, command, alias, args) -> Arrays.asList("dwarf", "elf", "fire_dwarf", "naga", "clear", "whoami"));
-            pluginCommand.setExecutor(new CommandClass());
-        }
+  @Override
+  public void onEnable() {
+    AppliedStatus.getInstance();
+    new MineClassListeners(this);
+    PluginCommand pluginCommand = this.getCommand("class");
+    if (pluginCommand != null) {
+      pluginCommand.setTabCompleter(
+          (sender, command, alias, args) ->
+              Arrays.asList("dwarf", "elf", "fire_dwarf", "naga", "clear", "whoami"));
+      pluginCommand.setExecutor(new CommandClass());
     }
+  }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-    }
+  @Override
+  public void onDisable() {
+    // Plugin shutdown logic
+  }
 }

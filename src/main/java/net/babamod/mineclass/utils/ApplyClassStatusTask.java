@@ -7,17 +7,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class ApplyClassStatusTask extends BukkitRunnable {
 
-    private final JavaPlugin plugin;
-    private final Player player;
+  private final JavaPlugin plugin;
+  private final Player player;
 
-    public ApplyClassStatusTask(JavaPlugin plugin, Player player) {
-        this.plugin = plugin;
-        this.player = player;
-    }
+  public ApplyClassStatusTask(JavaPlugin plugin, Player player) {
+    this.plugin = plugin;
+    this.player = player;
+  }
 
-    @Override
-    public void run() {
-        ClassWrapper.reapplyRightClassEffects(player, false);
-    }
-
+  @Override
+  public void run() {
+    ClassWrapper.reapplyRightClassEffects(player, false);
+  }
 }

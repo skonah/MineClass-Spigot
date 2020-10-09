@@ -4,6 +4,8 @@ import net.babamod.mineclass.utils.Pair;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -13,70 +15,119 @@ import java.util.stream.Stream;
 
 public class NagaClass {
 
-    private static final Set<Material> forbiddenItems = new HashSet<Material>() {{
-        add(Material.DIAMOND_SWORD);
-        add(Material.GOLDEN_SWORD);
-        add(Material.IRON_SWORD);
-        add(Material.NETHERITE_SWORD);
-        add(Material.DIAMOND_AXE);
-        add(Material.GOLDEN_AXE);
-        add(Material.IRON_AXE);
-        add(Material.NETHERITE_AXE);
-        add(Material.CROSSBOW);
-        add(Material.BOW);
-        add(Material.FLINT_AND_STEEL);
-    }};
+  private static final Set<Material> forbiddenItems =
+      new HashSet<Material>() {
+        {
+          add(Material.DIAMOND_SWORD);
+          add(Material.GOLDEN_SWORD);
+          add(Material.IRON_SWORD);
+          add(Material.NETHERITE_SWORD);
+          add(Material.DIAMOND_AXE);
+          add(Material.GOLDEN_AXE);
+          add(Material.IRON_AXE);
+          add(Material.NETHERITE_AXE);
+          add(Material.CROSSBOW);
+          add(Material.BOW);
+          add(Material.FLINT_AND_STEEL);
+        }
+      };
 
-    private static final Map<PotionEffectType, Integer> potionEffects = Stream.of(new Object[][]{
-            {PotionEffectType.DOLPHINS_GRACE, 1},
-            {PotionEffectType.CONDUIT_POWER, 1},
-            {PotionEffectType.WATER_BREATHING, 1},
-            {PotionEffectType.SLOW, 2},
-            {PotionEffectType.WEAKNESS, 1},
-    }).collect(Collectors.toMap(data -> (PotionEffectType) data[0], data -> (Integer) data[1]));
+  private static final Map<PotionEffectType, Integer> potionEffects =
+      Stream.of(
+              new Object[][] {
+                {PotionEffectType.DOLPHINS_GRACE, 1},
+                {PotionEffectType.CONDUIT_POWER, 1},
+                {PotionEffectType.WATER_BREATHING, 1},
+                {PotionEffectType.SLOW, 2},
+                {PotionEffectType.WEAKNESS, 1},
+              })
+          .collect(Collectors.toMap(data -> (PotionEffectType) data[0], data -> (Integer) data[1]));
 
-    private static final Map<Material, List<Pair<Enchantment, Integer>>> classEnchantment = Stream.of(
-            new AbstractMap.SimpleEntry<>(Material.TRIDENT, Arrays.asList(
-                    new Pair<>(Enchantment.LOYALTY, 3),
-                    new Pair<>(Enchantment.IMPALING, 5),
-                    new Pair<>(Enchantment.CHANNELING, 1)
-            )),
-            new AbstractMap.SimpleEntry<>(Material.NETHERITE_HOE, Collections.singletonList(
-                    new Pair<>(Enchantment.DAMAGE_ALL, 5)
-            )),
-            new AbstractMap.SimpleEntry<>(Material.DIAMOND_HOE, Collections.singletonList(
-                    new Pair<>(Enchantment.DAMAGE_ALL, 5)
-            )),
-            new AbstractMap.SimpleEntry<>(Material.IRON_HOE, Collections.singletonList(
-                    new Pair<>(Enchantment.DAMAGE_ALL, 5)
-            )),
-            new AbstractMap.SimpleEntry<>(Material.WOODEN_HOE, Collections.singletonList(
-                    new Pair<>(Enchantment.DAMAGE_ALL, 5)
-            )),
-            new AbstractMap.SimpleEntry<>(Material.GOLDEN_HOE, Collections.singletonList(
-                    new Pair<>(Enchantment.DAMAGE_ALL, 5)
-            )),
-            new AbstractMap.SimpleEntry<>(Material.STONE_HOE, Collections.singletonList(
-                    new Pair<>(Enchantment.DAMAGE_ALL, 5)
-            )),
-            new AbstractMap.SimpleEntry<>(Material.FISHING_ROD, Arrays.asList(
-                    new Pair<>(Enchantment.LUCK, 3),
-                    new Pair<>(Enchantment.LURE, 3)
-            ))
-    ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  private static final Map<Material, List<Pair<Enchantment, Integer>>> classEnchantments =
+      Stream.of(
+              new AbstractMap.SimpleEntry<>(
+                  Material.TRIDENT,
+                  Arrays.asList(
+                      new Pair<>(Enchantment.LOYALTY, 3),
+                      new Pair<>(Enchantment.IMPALING, 5),
+                      new Pair<>(Enchantment.CHANNELING, 1))),
+              new AbstractMap.SimpleEntry<>(
+                  Material.NETHERITE_HOE,
+                  Collections.singletonList(new Pair<>(Enchantment.DAMAGE_ALL, 5))),
+              new AbstractMap.SimpleEntry<>(
+                  Material.DIAMOND_HOE,
+                  Collections.singletonList(new Pair<>(Enchantment.DAMAGE_ALL, 5))),
+              new AbstractMap.SimpleEntry<>(
+                  Material.IRON_HOE,
+                  Collections.singletonList(new Pair<>(Enchantment.DAMAGE_ALL, 5))),
+              new AbstractMap.SimpleEntry<>(
+                  Material.WOODEN_HOE,
+                  Collections.singletonList(new Pair<>(Enchantment.DAMAGE_ALL, 5))),
+              new AbstractMap.SimpleEntry<>(
+                  Material.GOLDEN_HOE,
+                  Collections.singletonList(new Pair<>(Enchantment.DAMAGE_ALL, 5))),
+              new AbstractMap.SimpleEntry<>(
+                  Material.STONE_HOE,
+                  Collections.singletonList(new Pair<>(Enchantment.DAMAGE_ALL, 5))),
+              new AbstractMap.SimpleEntry<>(
+                  Material.FISHING_ROD,
+                  Arrays.asList(new Pair<>(Enchantment.LUCK, 3), new Pair<>(Enchantment.LURE, 3))))
+          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    public static boolean is(Player player) {
-        return player.getActivePotionEffects().stream().map(PotionEffect::getType).collect(Collectors.toList()).containsAll(potionEffects.keySet());
-    }
+  public static boolean is(Player player) {
+    return player.getActivePotionEffects().stream()
+        .map(PotionEffect::getType)
+        .collect(Collectors.toList())
+        .containsAll(potionEffects.keySet());
+  }
 
-    public static void reapplyEffects(Player player) {
-        potionEffects.forEach((key, value) -> {
+  public static void reapplyEffects(Player player) {
+    potionEffects.forEach(
+        (key, value) -> {
+          if (player.hasPotionEffect(key)) {
             player.removePotionEffect(key);
-            player.addPotionEffect(new PotionEffect(key, Integer.MAX_VALUE, value - 1, false, false));
+          }
+          player.addPotionEffect(new PotionEffect(key, Integer.MAX_VALUE, value - 1, false, false));
         });
-    }
+  }
 
-    public static boolean isItemForbidden(Material type) {
-        return forbiddenItems.contains(type);
+  public static boolean isItemForbidden(Material type) {
+    return forbiddenItems.contains(type);
+  }
+
+  public static boolean isItemEnchantable(Material type) {
+    return classEnchantments.containsKey(type);
+  }
+
+  public static void enchantItem(ItemStack itemStack) {
+    if (itemStack.getItemMeta() != null) {
+      ItemMeta itemMeta = itemStack.getItemMeta();
+      itemMeta.setUnbreakable(true);
+      itemMeta.setLore(Collections.singletonList("Soulbound"));
+      itemStack.setItemMeta(itemMeta);
     }
+    classEnchantments
+        .getOrDefault(itemStack.getType(), new ArrayList<>())
+        .forEach(
+            enchantmentIntegerPair ->
+                itemStack
+                    .addUnsafeEnchantment(
+                        enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
+  }
+
+  public static void giveClassItem(Player player) {
+    List<Boolean> itemStackList =
+        Arrays.stream(player.getInventory().getContents())
+            .filter(Objects::nonNull)
+            .map(ClassWrapper::isSoulBound)
+            .collect(Collectors.toList());
+    if (itemStackList.contains(true)) {
+      return;
+    }
+    for (Material material : classEnchantments.keySet()) {
+      ItemStack itemStack = new ItemStack(material);
+      enchantItem(itemStack);
+      player.getInventory().addItem(itemStack);
+    }
+  }
 }
