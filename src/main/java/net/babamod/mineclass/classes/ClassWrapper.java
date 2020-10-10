@@ -5,11 +5,11 @@ import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ClassWrapper {
 
@@ -84,33 +84,48 @@ public class ClassWrapper {
     return false;
   }
 
-  public static void enchantItem(Player player, Item item) {
+  public static void enchantItem(Player player, ItemStack itemStack) {
     if (AppliedStatus.getInstance().isDwarf(player.getName())) {
-      DwarfClass.enchantItem(item.getItemStack());
+      setUnbreakableAndSoulbound(itemStack);
+      DwarfClass.enchantItem(itemStack);
     }
     if (AppliedStatus.getInstance().isElf(player.getName())) {
-      ElfClass.enchantItem(item.getItemStack());
+      setUnbreakableAndSoulbound(itemStack);
+      ElfClass.enchantItem(itemStack);
     }
     if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
-      FireDwarfClass.enchantItem(item.getItemStack());
+      setUnbreakableAndSoulbound(itemStack);
+      FireDwarfClass.enchantItem(itemStack);
     }
     if (AppliedStatus.getInstance().isNaga(player.getName())) {
-      NagaClass.enchantItem(item.getItemStack());
+      setUnbreakableAndSoulbound(itemStack);
+      NagaClass.enchantItem(itemStack);
     }
   }
 
-  public static void givePlayerClassItem(Player player) {
-    if (AppliedStatus.getInstance().isDwarf(player.getName())) {
-      DwarfClass.giveClassItem(player);
+  public static void removeAllEnchantments(ItemStack itemStack) {
+    itemStack
+        .getEnchantments()
+        .keySet()
+        .forEach(itemStack::removeEnchantment);
+    removeUnbreakableAndSoulbound(itemStack);
+  }
+
+  public static void setUnbreakableAndSoulbound(ItemStack itemStack) {
+    if (itemStack.getItemMeta() != null) {
+      ItemMeta itemMeta = itemStack.getItemMeta();
+      itemMeta.setUnbreakable(true);
+      itemMeta.setLore(Collections.singletonList("Soulbound"));
+      itemStack.setItemMeta(itemMeta);
     }
-    if (AppliedStatus.getInstance().isElf(player.getName())) {
-      ElfClass.giveClassItem(player);
-    }
-    if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
-      FireDwarfClass.giveClassItem(player);
-    }
-    if (AppliedStatus.getInstance().isNaga(player.getName())) {
-      NagaClass.giveClassItem(player);
+  }
+
+  public static void removeUnbreakableAndSoulbound(ItemStack itemStack) {
+    if (itemStack.getItemMeta() != null) {
+      ItemMeta itemMeta = itemStack.getItemMeta();
+      itemMeta.setUnbreakable(false);
+      itemMeta.setLore(new ArrayList<>());
+      itemStack.setItemMeta(itemMeta);
     }
   }
 
@@ -119,16 +134,5 @@ public class ClassWrapper {
       return itemStack.getItemMeta().getLore().contains("Soulbound");
     }
     return false;
-  }
-
-  public static void removePlayerClassItem(Player player) {
-    for (ItemStack content :
-        Arrays.stream(player.getInventory().getContents())
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList())) {
-      if (isSoulBound(content)) {
-        player.getInventory().remove(content);
-      }
-    }
   }
 }

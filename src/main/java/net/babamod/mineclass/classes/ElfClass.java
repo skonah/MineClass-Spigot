@@ -80,17 +80,7 @@ public class ElfClass {
     return classEnchantments.containsKey(type);
   }
 
-  public static void makeSoulbound(ItemStack itemStack) {
-    if (itemStack.getItemMeta() != null) {
-      ItemMeta itemMeta = itemStack.getItemMeta();
-      itemMeta.setUnbreakable(true);
-      itemMeta.setLore(Collections.singletonList("Soulbound"));
-      itemStack.setItemMeta(itemMeta);
-    }
-  }
-
   public static void enchantItem(ItemStack itemStack) {
-    makeSoulbound(itemStack);
     classEnchantments
         .getOrDefault(itemStack.getType(), new ArrayList<>())
         .forEach(
@@ -98,26 +88,5 @@ public class ElfClass {
                 itemStack
                     .addUnsafeEnchantment(
                         enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
-  }
-
-  public static void giveClassItem(Player player) {
-    List<Boolean> itemStackList =
-        Arrays.stream(player.getInventory().getContents())
-            .filter(Objects::nonNull)
-            .map(ClassWrapper::isSoulBound)
-            .collect(Collectors.toList());
-    if (itemStackList.contains(true)) {
-      return;
-    }
-    for (Material material : classEnchantments.keySet()) {
-      if (material.equals(Material.BOW)) {
-        ItemStack itemStack = new ItemStack(Material.ARROW);
-        makeSoulbound(itemStack);
-        player.getInventory().addItem(itemStack);
-      }
-      ItemStack itemStack = new ItemStack(material);
-      enchantItem(itemStack);
-      player.getInventory().addItem(itemStack);
-    }
   }
 }

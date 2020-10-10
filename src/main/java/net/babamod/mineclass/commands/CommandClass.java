@@ -23,7 +23,6 @@ public class CommandClass implements CommandExecutor {
         AppliedStatus.getInstance().setDwarf(player.getName(), true);
         ClassWrapper.clearAllClassEffects(player);
         DwarfClass.reapplyEffects(player);
-        DwarfClass.giveClassItem(player);
         return true;
       }
       if (args[0].equals("elf")) {
@@ -33,7 +32,6 @@ public class CommandClass implements CommandExecutor {
         AppliedStatus.getInstance().setElf(player.getName(), true);
         ClassWrapper.clearAllClassEffects(player);
         ElfClass.reapplyEffects(player);
-        ElfClass.giveClassItem(player);
         return true;
       }
       if (args[0].equals("fire_dwarf")) {
@@ -43,7 +41,6 @@ public class CommandClass implements CommandExecutor {
         AppliedStatus.getInstance().setFireDwarf(player.getName(), true);
         ClassWrapper.clearAllClassEffects(player);
         FireDwarfClass.reapplyEffects(player);
-        FireDwarfClass.giveClassItem(player);
         return true;
       }
       if (args[0].equals("naga")) {
@@ -53,7 +50,6 @@ public class CommandClass implements CommandExecutor {
         AppliedStatus.getInstance().setNaga(player.getName(), true);
         ClassWrapper.clearAllClassEffects(player);
         NagaClass.reapplyEffects(player);
-        NagaClass.giveClassItem(player);
         return true;
       }
       if (args[0].equals("clear")) {
@@ -62,7 +58,6 @@ public class CommandClass implements CommandExecutor {
         AppliedStatus.getInstance().setFireDwarf(player.getName(), false);
         AppliedStatus.getInstance().setNaga(player.getName(), false);
         ClassWrapper.clearAllClassEffects(player);
-        ClassWrapper.removePlayerClassItem(player);
         return true;
       }
       if (args[0].equals("whoami")) {

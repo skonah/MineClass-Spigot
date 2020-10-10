@@ -102,33 +102,11 @@ public class DwarfClass {
   }
 
   public static void enchantItem(ItemStack itemStack) {
-    if (itemStack.getItemMeta() != null) {
-      ItemMeta itemMeta = itemStack.getItemMeta();
-      itemMeta.setUnbreakable(true);
-      itemMeta.setLore(Collections.singletonList("Soulbound"));
-      itemStack.setItemMeta(itemMeta);
-    }
     classEnchantments
         .getOrDefault(itemStack.getType(), new ArrayList<>())
         .forEach(
             enchantmentIntegerPair ->
                 itemStack.addUnsafeEnchantment(
                     enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
-  }
-
-  public static void giveClassItem(Player player) {
-    List<Boolean> itemStackList =
-        Arrays.stream(player.getInventory().getContents())
-            .filter(Objects::nonNull)
-            .map(ClassWrapper::isSoulBound)
-            .collect(Collectors.toList());
-    if (itemStackList.contains(true)) {
-      return;
-    }
-    for (Material material : classEnchantments.keySet()) {
-      ItemStack itemStack = new ItemStack(material);
-      enchantItem(itemStack);
-      player.getInventory().addItem(itemStack);
-    }
   }
 }
