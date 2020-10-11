@@ -3,10 +3,8 @@ package net.babamod.mineclass.classes;
 import net.babamod.mineclass.utils.Pair;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -32,7 +30,6 @@ public class FireDwarfClass {
           add(Material.IRON_SHOVEL);
           add(Material.NETHERITE_SHOVEL);
           add(Material.BOW);
-          add(Material.ARROW);
           add(Material.TRIDENT);
         }
       };
@@ -87,6 +84,9 @@ public class FireDwarfClass {
                   Material.WOODEN_PICKAXE,
                   Collections.singletonList(new Pair<>(Enchantment.DIG_SPEED, 5))),
               new AbstractMap.SimpleEntry<>(
+                  Material.CROSSBOW,
+                  Collections.singletonList(new Pair<>(Enchantment.ARROW_INFINITE, 1))),
+              new AbstractMap.SimpleEntry<>(
                   Material.FLINT_AND_STEEL, new ArrayList<Pair<Enchantment, Integer>>())
               // See to make infinity working on crossbow
               // Inventory auto smelt
@@ -123,8 +123,7 @@ public class FireDwarfClass {
         .getOrDefault(itemStack.getType(), new ArrayList<>())
         .forEach(
             enchantmentIntegerPair ->
-                itemStack
-                    .addUnsafeEnchantment(
-                        enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
+                itemStack.addUnsafeEnchantment(
+                    enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
   }
 }

@@ -2,7 +2,6 @@ package net.babamod.mineclass.classes;
 
 import net.babamod.mineclass.utils.AppliedStatus;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -86,28 +85,33 @@ public class ClassWrapper {
 
   public static void enchantItem(Player player, ItemStack itemStack) {
     if (AppliedStatus.getInstance().isDwarf(player.getName())) {
-      setUnbreakableAndSoulbound(itemStack);
-      DwarfClass.enchantItem(itemStack);
+      if (DwarfClass.isItemEnchantable(itemStack.getType())) {
+        setUnbreakableAndSoulbound(itemStack);
+        DwarfClass.enchantItem(itemStack);
+      }
     }
     if (AppliedStatus.getInstance().isElf(player.getName())) {
-      setUnbreakableAndSoulbound(itemStack);
-      ElfClass.enchantItem(itemStack);
+      if (ElfClass.isItemEnchantable(itemStack.getType())) {
+        setUnbreakableAndSoulbound(itemStack);
+        ElfClass.enchantItem(itemStack);
+      }
     }
     if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
-      setUnbreakableAndSoulbound(itemStack);
-      FireDwarfClass.enchantItem(itemStack);
+      if (FireDwarfClass.isItemEnchantable(itemStack.getType())) {
+        setUnbreakableAndSoulbound(itemStack);
+        FireDwarfClass.enchantItem(itemStack);
+      }
     }
     if (AppliedStatus.getInstance().isNaga(player.getName())) {
-      setUnbreakableAndSoulbound(itemStack);
-      NagaClass.enchantItem(itemStack);
+      if (NagaClass.isItemEnchantable(itemStack.getType())) {
+        setUnbreakableAndSoulbound(itemStack);
+        NagaClass.enchantItem(itemStack);
+      }
     }
   }
 
   public static void removeAllEnchantments(ItemStack itemStack) {
-    itemStack
-        .getEnchantments()
-        .keySet()
-        .forEach(itemStack::removeEnchantment);
+    itemStack.getEnchantments().keySet().forEach(itemStack::removeEnchantment);
     removeUnbreakableAndSoulbound(itemStack);
   }
 

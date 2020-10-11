@@ -4,21 +4,22 @@ import net.babamod.mineclass.Mineclass;
 import net.babamod.mineclass.classes.ClassWrapper;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SmallFireball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,15 +51,10 @@ public class MineClassListeners implements Listener {
   public void on(EntityPickupItemEvent event) {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
-      player.sendMessage("You picked up " + event.getItem().getItemStack().getType());
       if (ClassWrapper.isItemForbidden(player, event.getItem().getItemStack().getType())) {
         event.setCancelled(true);
       }
-      player.sendMessage(
-          String.valueOf(
-              ClassWrapper.isItemEnchantable(player, event.getItem().getItemStack().getType())));
       if (ClassWrapper.isItemEnchantable(player, event.getItem().getItemStack().getType())) {
-        player.sendMessage("Enchantable item !");
         ClassWrapper.enchantItem(player, event.getItem().getItemStack());
       }
     }
@@ -82,66 +78,127 @@ public class MineClassListeners implements Listener {
   }
 
   @EventHandler
-  public void on(PlayerDropItemEvent event) {
-    if (ClassWrapper.isSoulBound(event.getItemDrop().getItemStack())) {
-      ClassWrapper.removeAllEnchantments(event.getItemDrop().getItemStack());
+  public void on(InventoryClickEvent event) {
+    if ((event.getAction().equals(InventoryAction.PICKUP_ALL)
+            || event.getAction().equals(InventoryAction.PICKUP_HALF)
+            || event.getAction().equals(InventoryAction.PICKUP_ONE)
+            || event.getAction().equals(InventoryAction.PICKUP_SOME))
+        && event.getWhoClicked() instanceof Player) {
+      if (isForbiddenItem(event)) {
+        event.setCancelled(true);
+        return;
+      }
+      enchantItem(event);
+    }
+
+    if ((event.getAction().equals(InventoryAction.PLACE_ALL)
+            || event.getAction().equals(InventoryAction.PLACE_ONE)
+            || event.getAction().equals(InventoryAction.PLACE_SOME))
+        && event.getWhoClicked() instanceof Player
+        && !(event.getClickedInventory() instanceof PlayerInventory)) {
+      unenchantItem(event);
+    }
+
+    if ((event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))
+        && event.getWhoClicked() instanceof Player) {
+      if (isForbiddenItem(event)) {
+        event.setCancelled(true);
+        return;
+      }
+      enchantItem(event);
+    }
+  }
+
+  private boolean isForbiddenItem(InventoryClickEvent event) {
+    Player player = (Player) event.getWhoClicked();
+    if (AppliedStatus.getInstance().hasAClass(player.getName())) {
+      if (event.getCurrentItem() != null
+          && ClassWrapper.isItemForbidden(player, event.getCurrentItem().getType())) {
+        return true;
+      }
+      return event.getCursor() != null
+              && ClassWrapper.isItemForbidden(player, event.getCursor().getType());
+    }
+    return false;
+  }
+
+  private void enchantItem(InventoryClickEvent event) {
+    Player player = (Player) event.getWhoClicked();
+    if (AppliedStatus.getInstance().hasAClass(player.getName())) {
+      if (event.getCurrentItem() != null && !ClassWrapper.isSoulBound(event.getCurrentItem())) {
+        ClassWrapper.enchantItem(player, event.getCurrentItem());
+      }
+      if (event.getCursor() != null && !ClassWrapper.isSoulBound(event.getCursor())) {
+        ClassWrapper.enchantItem(player, event.getCursor());
+      }
+    }
+  }
+
+  private void unenchantItem(InventoryClickEvent event) {
+    Player player = (Player) event.getWhoClicked();
+    if (AppliedStatus.getInstance().hasAClass(player.getName())) {
+      if (event.getCurrentItem() != null && ClassWrapper.isSoulBound(event.getCurrentItem())) {
+        ClassWrapper.removeAllEnchantments(event.getCurrentItem());
+      }
+      if (event.getCursor() != null && ClassWrapper.isSoulBound(event.getCursor())) {
+        ClassWrapper.removeAllEnchantments(event.getCursor());
+      }
     }
   }
 
   @EventHandler
-  public void on(InventoryClickEvent event) {
-    System.out.println("InventoryClickEvent triggered !");
-    System.out.println("-----------------------------------");
-    System.out.println(event.getAction());
-    System.out.println(event.getClick());
-    System.out.println(event.getClickedInventory());
-    System.out.println(event.getCurrentItem());
-    System.out.println(event.getCursor());
-    System.out.println(event.getSlotType());
-    System.out.println(Arrays.toString(event.getHandlers().getRegisteredListeners()));
-    System.out.println(event.getHotbarButton());
-    System.out.println(event.getRawSlot());
-    System.out.println(event.getSlot());
-
-    if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)
-        && event.getClickedInventory() instanceof CraftingInventory) {
-      System.out.println("We are in a crafting inventory.");
-      CraftingInventory playerInventory = (CraftingInventory) event.getClickedInventory();
-      if (event.getCurrentItem() != null
-          && playerInventory.getHolder() != null
-          && !ClassWrapper.isSoulBound(event.getCurrentItem())) {
-        System.out.println("Enchanting item !");
-        ClassWrapper.enchantItem((Player) playerInventory.getHolder(), event.getCurrentItem());
-      }
-      if (event.getCursor() != null
-          && playerInventory.getHolder() != null
-          && !ClassWrapper.isSoulBound(event.getCursor())) {
-        System.out.println("Enchanting item !");
-        ClassWrapper.enchantItem((Player) playerInventory.getHolder(), event.getCursor());
+  public void on(BlockBreakEvent event) {
+    Player player = event.getPlayer();
+    if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
+      List<ItemStack> itemStacks =
+          event.getBlock().getDrops().stream()
+              .map(
+                  itemStack -> {
+                    ItemStack smelted = SmeltingEngine.smelt(itemStack);
+                    if (smelted != null) {
+                      return smelted;
+                    } else return itemStack;
+                  })
+              .collect(Collectors.toList());
+      if (!itemStacks.isEmpty()) {
+        event.setCancelled(true);
+        itemStacks.forEach(
+            itemStack ->
+                event
+                    .getBlock()
+                    .getWorld()
+                    .dropItemNaturally(event.getBlock().getLocation(), itemStack));
+        event.getBlock().setType(Material.AIR);
       }
     }
-
-    if (event.getAction().equals(InventoryAction.PLACE_ALL)
-        && event.getClickedInventory() instanceof PlayerInventory) {
-      System.out.println("We are in a player inventory.");
-      PlayerInventory playerInventory = (PlayerInventory) event.getClickedInventory();
-      if (event.getCurrentItem() != null
-          && playerInventory.getHolder() != null
-          && !ClassWrapper.isSoulBound(event.getCurrentItem())) {
-        System.out.println("Enchanting item !");
-        ClassWrapper.enchantItem((Player) playerInventory.getHolder(), event.getCurrentItem());
-      }
-      if (event.getCursor() != null
-          && playerInventory.getHolder() != null
-          && !ClassWrapper.isSoulBound(event.getCursor())) {
-        System.out.println("Enchanting item !");
-        ClassWrapper.enchantItem((Player) playerInventory.getHolder(), event.getCursor());
-      }
-    }
-    System.out.println("-----------------------------------");
   }
 
-  /*
-  IMPOSSIBLE DE GIVER LES ITEMS DE CLASSES.
-   */
+  @EventHandler
+  public void on(PlayerInteractEvent event) {
+    if (event.getItem() != null && event.getItem().getType().equals(Material.CROSSBOW)) {
+      if (event
+          .getPlayer()
+          .getInventory()
+          .getItemInOffHand()
+          .getType()
+          .equals(Material.FIREWORK_ROCKET)) {
+        event
+            .getPlayer()
+            .sendMessage("You've interacted with a crossbow with a firework in offhand.");
+      }
+    }
+  }
+
+  @EventHandler
+  public void on(EntityShootBowEvent event) {
+    if (event.getBow() != null && event.getBow().getType().equals(Material.CROSSBOW)) {
+      if (event.getEntity() instanceof Player) {
+        Player player = (Player) event.getEntity();
+        if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
+          player.getInventory().addItem(new ItemStack(Material.ARROW));
+          event.setProjectile(player.launchProjectile(SmallFireball.class));
+        }
+      }
+    }
+  }
 }

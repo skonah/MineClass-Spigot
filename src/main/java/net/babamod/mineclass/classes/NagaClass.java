@@ -5,7 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -104,8 +103,7 @@ public class NagaClass {
         .getOrDefault(itemStack.getType(), new ArrayList<>())
         .forEach(
             enchantmentIntegerPair ->
-                itemStack
-                    .addUnsafeEnchantment(
-                        enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
+                itemStack.addUnsafeEnchantment(
+                    enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
   }
 }

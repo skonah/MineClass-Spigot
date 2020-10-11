@@ -3,10 +3,8 @@ package net.babamod.mineclass.classes;
 import net.babamod.mineclass.utils.Pair;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -85,8 +83,7 @@ public class ElfClass {
         .getOrDefault(itemStack.getType(), new ArrayList<>())
         .forEach(
             enchantmentIntegerPair ->
-                itemStack
-                    .addUnsafeEnchantment(
-                        enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
+                itemStack.addUnsafeEnchantment(
+                    enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
   }
 }
