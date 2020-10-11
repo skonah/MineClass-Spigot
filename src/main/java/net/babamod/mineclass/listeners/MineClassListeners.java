@@ -8,8 +8,8 @@ import net.babamod.mineclass.utils.ClassItemPossessed;
 import net.babamod.mineclass.utils.SmeltingEngine;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SmallFireball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
@@ -20,6 +20,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -157,6 +158,7 @@ public class MineClassListeners implements Listener {
         Player player = (Player) event.getEntity();
         if (event.getBow().getEnchantments().containsKey(Enchantment.ARROW_INFINITE)) {
           player.getInventory().addItem(new ItemStack(Material.ARROW));
+          ((AbstractArrow)event.getProjectile()).setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         }
         if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
           event.getProjectile().setFireTicks(10000);
