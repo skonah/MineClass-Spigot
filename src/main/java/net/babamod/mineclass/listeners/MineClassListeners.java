@@ -154,7 +154,8 @@ public class MineClassListeners implements Listener {
     if (event.getBow() != null && event.getBow().getType().equals(Material.CROSSBOW)) {
       if (event.getEntity() instanceof Player) {
         Player player = (Player) event.getEntity();
-        if (event.getBow().getEnchantments().containsKey(Enchantment.ARROW_INFINITE)) {
+        if (event.getProjectile() instanceof AbstractArrow
+            && event.getBow().getEnchantments().containsKey(Enchantment.ARROW_INFINITE)) {
           player.getInventory().addItem(new ItemStack(Material.ARROW));
           ((AbstractArrow) event.getProjectile())
               .setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
@@ -181,7 +182,7 @@ public class MineClassListeners implements Listener {
   public void on(FoodLevelChangeEvent event) {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
-      if (AppliedStatus.getInstance().isElf(player.getName()) && player.isSprinting()) {
+      if (AppliedStatus.getInstance().isElf(player.getName())) {
         event.setCancelled(true);
       }
     }
