@@ -1,7 +1,11 @@
-package net.babamod.mineclass.utils;
+package net.babamod.mineclass.listeners;
 
 import net.babamod.mineclass.Mineclass;
 import net.babamod.mineclass.classes.ClassWrapper;
+import net.babamod.mineclass.utils.AppliedStatus;
+import net.babamod.mineclass.utils.ApplyClassStatusTask;
+import net.babamod.mineclass.utils.ClassItemPossessed;
+import net.babamod.mineclass.utils.SmeltingEngine;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SmallFireball;
@@ -91,14 +95,6 @@ public class MineClassListeners implements Listener {
       enchantItem(event);
     }
 
-    if ((event.getAction().equals(InventoryAction.PLACE_ALL)
-            || event.getAction().equals(InventoryAction.PLACE_ONE)
-            || event.getAction().equals(InventoryAction.PLACE_SOME))
-        && event.getWhoClicked() instanceof Player
-        && !(event.getClickedInventory() instanceof PlayerInventory)) {
-      unenchantItem(event);
-    }
-
     if ((event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))
         && event.getWhoClicked() instanceof Player) {
       if (isForbiddenItem(event)) {
@@ -134,18 +130,6 @@ public class MineClassListeners implements Listener {
     }
   }
 
-  private void unenchantItem(InventoryClickEvent event) {
-    Player player = (Player) event.getWhoClicked();
-    if (AppliedStatus.getInstance().hasAClass(player.getName())) {
-      if (event.getCurrentItem() != null && ClassWrapper.isSoulBound(event.getCurrentItem())) {
-        ClassWrapper.removeAllEnchantments(event.getCurrentItem());
-      }
-      if (event.getCursor() != null && ClassWrapper.isSoulBound(event.getCursor())) {
-        ClassWrapper.removeAllEnchantments(event.getCursor());
-      }
-    }
-  }
-
   @EventHandler
   public void on(BlockBreakEvent event) {
     Player player = event.getPlayer();
@@ -169,22 +153,6 @@ public class MineClassListeners implements Listener {
                     .getWorld()
                     .dropItemNaturally(event.getBlock().getLocation(), itemStack));
         event.getBlock().setType(Material.AIR);
-      }
-    }
-  }
-
-  @EventHandler
-  public void on(PlayerInteractEvent event) {
-    if (event.getItem() != null && event.getItem().getType().equals(Material.CROSSBOW)) {
-      if (event
-          .getPlayer()
-          .getInventory()
-          .getItemInOffHand()
-          .getType()
-          .equals(Material.FIREWORK_ROCKET)) {
-        event
-            .getPlayer()
-            .sendMessage("You've interacted with a crossbow with a firework in offhand.");
       }
     }
   }

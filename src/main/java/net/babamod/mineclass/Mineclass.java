@@ -2,7 +2,7 @@ package net.babamod.mineclass;
 
 import net.babamod.mineclass.commands.CommandClass;
 import net.babamod.mineclass.utils.AppliedStatus;
-import net.babamod.mineclass.utils.MineClassListeners;
+import net.babamod.mineclass.listeners.MineClassListeners;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
