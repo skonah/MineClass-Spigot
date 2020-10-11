@@ -13,14 +13,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -158,11 +156,33 @@ public class MineClassListeners implements Listener {
         Player player = (Player) event.getEntity();
         if (event.getBow().getEnchantments().containsKey(Enchantment.ARROW_INFINITE)) {
           player.getInventory().addItem(new ItemStack(Material.ARROW));
-          ((AbstractArrow)event.getProjectile()).setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+          ((AbstractArrow) event.getProjectile())
+              .setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         }
         if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
           event.getProjectile().setFireTicks(10000);
         }
+      }
+    }
+  }
+
+  @EventHandler
+  public void on(EntityDamageEvent event) {
+    if (event.getEntity() instanceof Player) {
+      Player player = (Player) event.getEntity();
+      if (event.getCause().equals(EntityDamageEvent.DamageCause.FALL)
+          && AppliedStatus.getInstance().isElf(player.getName())) {
+        event.setCancelled(true);
+      }
+    }
+  }
+
+  @EventHandler
+  public void on(FoodLevelChangeEvent event) {
+    if (event.getEntity() instanceof Player) {
+      Player player = (Player) event.getEntity();
+      if (AppliedStatus.getInstance().isElf(player.getName()) && player.isSprinting()) {
+        event.setCancelled(true);
       }
     }
   }
