@@ -7,6 +7,7 @@ import net.babamod.mineclass.utils.ApplyClassStatusTask;
 import net.babamod.mineclass.utils.ClassItemPossessed;
 import net.babamod.mineclass.utils.SmeltingEngine;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SmallFireball;
 import org.bukkit.event.EventHandler;
@@ -154,9 +155,11 @@ public class MineClassListeners implements Listener {
     if (event.getBow() != null && event.getBow().getType().equals(Material.CROSSBOW)) {
       if (event.getEntity() instanceof Player) {
         Player player = (Player) event.getEntity();
-        if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
+        if (event.getBow().getEnchantments().containsKey(Enchantment.ARROW_INFINITE)) {
           player.getInventory().addItem(new ItemStack(Material.ARROW));
-          event.setProjectile(player.launchProjectile(SmallFireball.class));
+        }
+        if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
+          event.getProjectile().setFireTicks(10000);
         }
       }
     }
