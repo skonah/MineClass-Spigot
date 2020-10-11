@@ -26,17 +26,17 @@ public class ClassItemPossessed {
     return INSTANCE;
   }
 
-  public void addItems(String playerName, List<ItemStack> itemStacks) {
+  public synchronized void addItems(String playerName, List<ItemStack> itemStacks) {
     List<ItemStack> itemStackList = itemsPossessed.getOrDefault(playerName, new ArrayList<>());
     itemStackList.addAll(itemStacks);
     itemsPossessed.put(playerName, itemStackList);
   }
 
-  public void clearItems(String playerName) {
+  public synchronized void clearItems(String playerName) {
     itemsPossessed.put(playerName, new ArrayList<>());
   }
 
-  public List<ItemStack> getItems(String playerName) {
+  public synchronized List<ItemStack> getItems(String playerName) {
     return itemsPossessed.get(playerName);
   }
 }

@@ -11,18 +11,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.SmallFireball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -113,7 +111,7 @@ public class MineClassListeners implements Listener {
         return true;
       }
       return event.getCursor() != null
-              && ClassWrapper.isItemForbidden(player, event.getCursor().getType());
+          && ClassWrapper.isItemForbidden(player, event.getCursor().getType());
     }
     return false;
   }
@@ -131,29 +129,18 @@ public class MineClassListeners implements Listener {
   }
 
   @EventHandler
-  public void on(BlockBreakEvent event) {
+  public void on(BlockDropItemEvent event) {
     Player player = event.getPlayer();
     if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
-      List<ItemStack> itemStacks =
-          event.getBlock().getDrops().stream()
-              .map(
-                  itemStack -> {
-                    ItemStack smelted = SmeltingEngine.smelt(itemStack);
-                    if (smelted != null) {
-                      return smelted;
-                    } else return itemStack;
-                  })
-              .collect(Collectors.toList());
-      if (!itemStacks.isEmpty()) {
-        event.setCancelled(true);
-        itemStacks.forEach(
-            itemStack ->
-                event
-                    .getBlock()
-                    .getWorld()
-                    .dropItemNaturally(event.getBlock().getLocation(), itemStack));
-        event.getBlock().setType(Material.AIR);
-      }
+      event
+          .getItems()
+          .forEach(
+              item -> {
+                ItemStack smelted = SmeltingEngine.getInstance().smelt(player, event.getBlock().getLocation(), item.getItemStack());
+                if (smelted != null) {
+                  item.setItemStack(smelted);
+                }
+              });
     }
   }
 

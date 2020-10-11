@@ -30,39 +30,39 @@ public class AppliedStatus implements Serializable {
     return INSTANCE;
   }
 
-  public void setDwarf(String playerName, boolean dwarf) {
+  public synchronized void setDwarf(String playerName, boolean dwarf) {
     this.dwarf.put(playerName, dwarf);
   }
 
-  public void setElf(String playerName, boolean elf) {
+  public synchronized void setElf(String playerName, boolean elf) {
     this.elf.put(playerName, elf);
   }
 
-  public void setFireDwarf(String playerName, boolean fireDwarf) {
+  public synchronized void setFireDwarf(String playerName, boolean fireDwarf) {
     this.fireDwarf.put(playerName, fireDwarf);
   }
 
-  public void setNaga(String playerName, boolean naga) {
+  public synchronized void setNaga(String playerName, boolean naga) {
     this.naga.put(playerName, naga);
   }
 
-  public boolean isDwarf(String playerName) {
+  public synchronized boolean isDwarf(String playerName) {
     return dwarf.getOrDefault(playerName, false);
   }
 
-  public boolean isElf(String playerName) {
+  public synchronized boolean isElf(String playerName) {
     return elf.getOrDefault(playerName, false);
   }
 
-  public boolean isFireDwarf(String playerName) {
+  public synchronized boolean isFireDwarf(String playerName) {
     return fireDwarf.getOrDefault(playerName, false);
   }
 
-  public boolean isNaga(String playerName) {
+  public synchronized boolean isNaga(String playerName) {
     return naga.getOrDefault(playerName, false);
   }
 
-  public boolean hasAClass(String playerName) {
+  public synchronized boolean hasAClass(String playerName) {
     return dwarf.getOrDefault(playerName, false)
         || elf.getOrDefault(playerName, false)
         || fireDwarf.getOrDefault(playerName, false)
