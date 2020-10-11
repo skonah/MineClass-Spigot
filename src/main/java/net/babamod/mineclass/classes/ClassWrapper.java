@@ -12,13 +12,14 @@ import java.util.Collections;
 
 public class ClassWrapper {
 
-  public static void reapplyRightClassEffects(Player player, boolean sendReminder) {
+  public static boolean reapplyRightClassEffects(Player player, boolean sendReminder) {
     if (AppliedStatus.getInstance().isDwarf(player.getName()) || DwarfClass.is(player)) {
       AppliedStatus.getInstance().setDwarf(player.getName(), true);
       DwarfClass.reapplyEffects(player);
       if (sendReminder) {
         player.sendMessage("Reminder : You are a dwarf.");
       }
+      return true;
     }
     if (AppliedStatus.getInstance().isElf(player.getName()) || ElfClass.is(player)) {
       AppliedStatus.getInstance().setElf(player.getName(), true);
@@ -26,6 +27,7 @@ public class ClassWrapper {
       if (sendReminder) {
         player.sendMessage("Reminder : You are an elf.");
       }
+      return true;
     }
     if (AppliedStatus.getInstance().isFireDwarf(player.getName()) || FireDwarfClass.is(player)) {
       AppliedStatus.getInstance().setFireDwarf(player.getName(), true);
@@ -33,6 +35,7 @@ public class ClassWrapper {
       if (sendReminder) {
         player.sendMessage("Reminder : You are a fire dwarf.");
       }
+      return true;
     }
     if (AppliedStatus.getInstance().isNaga(player.getName()) || NagaClass.is(player)) {
       AppliedStatus.getInstance().setNaga(player.getName(), true);
@@ -40,7 +43,9 @@ public class ClassWrapper {
       if (sendReminder) {
         player.sendMessage("Reminder : You are a naga.");
       }
+      return true;
     }
+    return false;
   }
 
   public static void clearAllClassEffects(Player player) {

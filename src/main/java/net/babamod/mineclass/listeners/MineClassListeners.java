@@ -37,7 +37,10 @@ public class MineClassListeners implements Listener {
   @EventHandler
   public void on(PlayerJoinEvent event) {
     Player player = event.getPlayer();
-    ClassWrapper.reapplyRightClassEffects(player, true);
+    if (!ClassWrapper.reapplyRightClassEffects(player, true)) {
+      player.sendMessage(
+          "Hello ! The amazing MineClass mod is available on this server ! You can pick a class with the /class command.");
+    }
   }
 
   @EventHandler
@@ -136,7 +139,9 @@ public class MineClassListeners implements Listener {
           .getItems()
           .forEach(
               item -> {
-                ItemStack smelted = SmeltingEngine.getInstance().smelt(player, event.getBlock().getLocation(), item.getItemStack());
+                ItemStack smelted =
+                    SmeltingEngine.getInstance()
+                        .smelt(player, event.getBlock().getLocation(), item.getItemStack());
                 if (smelted != null) {
                   item.setItemStack(smelted);
                 }
