@@ -11,6 +11,7 @@ import org.bukkit.inventory.Recipe;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Optional;
 
 public class SmeltingEngine {
   /** Instance unique pré-initialisée */
@@ -32,28 +33,28 @@ public class SmeltingEngine {
     return INSTANCE;
   }
 
-  public synchronized ItemStack smelt(Player player, Location location, ItemStack itemStack) {
-    ItemStack result = null;
+  public synchronized Optional<ItemStack> smelt(Player player, Location location, ItemStack itemStack) {
+    Optional<ItemStack> result = Optional.empty();
     Iterator<Recipe> iter = Bukkit.recipeIterator();
     while (iter.hasNext()) {
       Recipe recipe = iter.next();
       if (!(recipe instanceof FurnaceRecipe)) continue;
       if (((FurnaceRecipe) recipe).getInput().getType() != itemStack.getType()) continue;
-      result = recipe.getResult();
+      result = Optional.of(recipe.getResult());
       expModifier.computeIfAbsent(player.getName(), k -> new HashMap<>());
-      expModifier.get(player.getName()).putIfAbsent(result.getType(), 0.0f);
+      expModifier.get(player.getName()).putIfAbsent(result.get().getType(), 0.0f);
       expModifier
           .get(player.getName())
           .put(
-              result.getType(),
-              expModifier.get(player.getName()).get(result.getType())
+              result.get().getType(),
+              expModifier.get(player.getName()).get(result.get().getType())
                   + ((FurnaceRecipe) recipe).getExperience());
-      if (expModifier.get(player.getName()).get(result.getType()) >= 1) {
-        int exp = expModifier.get(player.getName()).get(result.getType()).intValue();
+      if (expModifier.get(player.getName()).get(result.get().getType()) >= 1) {
+        int exp = expModifier.get(player.getName()).get(result.get().getType()).intValue();
         player.getWorld().spawn(location, ExperienceOrb.class).setExperience(exp);
         expModifier
             .get(player.getName())
-            .put(result.getType(), expModifier.get(player.getName()).get(result.getType()) - exp);
+            .put(result.get().getType(), expModifier.get(player.getName()).get(result.get().getType()) - exp);
       }
       break;
     }

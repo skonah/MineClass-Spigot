@@ -1,13 +1,15 @@
 package net.babamod.mineclass;
 
+import net.babamod.mineclass.classes.MineClassFactory;
 import net.babamod.mineclass.commands.CommandClass;
-import net.babamod.mineclass.utils.AppliedStatus;
 import net.babamod.mineclass.listeners.MineClassListeners;
+import net.babamod.mineclass.utils.AppliedStatus;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Mineclass extends JavaPlugin implements Listener {
 
@@ -17,9 +19,12 @@ public final class Mineclass extends JavaPlugin implements Listener {
     new MineClassListeners(this);
     PluginCommand pluginCommand = this.getCommand("class");
     if (pluginCommand != null) {
+      List<String> arguments = new ArrayList<>(MineClassFactory.getInstance().getAvailableClassCodes());
+      arguments.add("clear");
+      arguments.add("whoami");
       pluginCommand.setTabCompleter(
           (sender, command, alias, args) ->
-              Arrays.asList("dwarf", "elf", "fire_dwarf", "naga", "clear", "whoami"));
+              arguments);
       pluginCommand.setExecutor(new CommandClass());
     }
   }

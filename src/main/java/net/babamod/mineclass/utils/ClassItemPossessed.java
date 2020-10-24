@@ -37,6 +37,6 @@ public class ClassItemPossessed {
   }
 
   public synchronized List<ItemStack> getItems(String playerName) {
-    return itemsPossessed.get(playerName);
+    return itemsPossessed.getOrDefault(playerName, new ArrayList<>());
   }
 }

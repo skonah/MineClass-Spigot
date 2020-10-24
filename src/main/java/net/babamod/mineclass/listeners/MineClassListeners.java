@@ -1,7 +1,8 @@
 package net.babamod.mineclass.listeners;
 
 import net.babamod.mineclass.Mineclass;
-import net.babamod.mineclass.classes.ClassWrapper;
+import net.babamod.mineclass.classes.MineClass;
+import net.babamod.mineclass.classes.MineClassFactory;
 import net.babamod.mineclass.utils.AppliedStatus;
 import net.babamod.mineclass.utils.ApplyClassStatusTask;
 import net.babamod.mineclass.utils.ClassItemPossessed;
@@ -16,13 +17,13 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MineClassListeners implements Listener {
@@ -37,7 +38,12 @@ public class MineClassListeners implements Listener {
   @EventHandler
   public void on(PlayerJoinEvent event) {
     Player player = event.getPlayer();
-    if (!ClassWrapper.reapplyRightClassEffects(player, true)) {
+    Optional<MineClass> mineClass = MineClassFactory.getInstance().getRightClass(player);
+    if (mineClass.isPresent()) {
+      mineClass.get().reapplyEffects(player);
+      player.sendMessage(
+          String.format("Reminder : You are a %s.", mineClass.get().getCode()));
+    } else {
       player.sendMessage(
           "Hello ! The amazing MineClass mod is available on this server ! You can pick a class with the /class command.");
     }
@@ -47,7 +53,7 @@ public class MineClassListeners implements Listener {
   public void on(PlayerItemConsumeEvent event) {
     if (event.getItem().getType().equals(Material.MILK_BUCKET)) {
       if (AppliedStatus.getInstance().hasAClass(event.getPlayer().getName())) {
-        new ApplyClassStatusTask(this.plugin, event.getPlayer()).runTaskLater(this.plugin, 10);
+        new ApplyClassStatusTask(event.getPlayer()).runTaskLater(this.plugin, 10);
       }
     }
   }
@@ -56,11 +62,14 @@ public class MineClassListeners implements Listener {
   public void on(EntityPickupItemEvent event) {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
-      if (ClassWrapper.isItemForbidden(player, event.getItem().getItemStack().getType())) {
-        event.setCancelled(true);
-      }
-      if (ClassWrapper.isItemEnchantable(player, event.getItem().getItemStack().getType())) {
-        ClassWrapper.enchantItem(player, event.getItem().getItemStack());
+      Optional<MineClass> mineClass = MineClassFactory.getInstance().getRightClass(player);
+      if (mineClass.isPresent()) {
+        if (mineClass.get().isItemForbidden(event.getItem().getItemStack().getType())) {
+          event.setCancelled(true);
+        }
+        if (mineClass.get().isItemEnchantable(event.getItem().getItemStack().getType())) {
+          mineClass.get().enchantItem(event.getItem().getItemStack());
+        }
       }
     }
   }
@@ -68,14 +77,16 @@ public class MineClassListeners implements Listener {
   @EventHandler
   public void on(PlayerDeathEvent event) {
     List<ItemStack> itemStackList =
-        event.getDrops().stream().filter(ClassWrapper::isSoulBound).collect(Collectors.toList());
+        event.getDrops().stream()
+            .filter(MineClassFactory::isSoulBound)
+            .collect(Collectors.toList());
     event.getDrops().removeAll(itemStackList);
     ClassItemPossessed.getInstance().addItems(event.getEntity().getName(), itemStackList);
   }
 
   @EventHandler
   public void on(PlayerRespawnEvent event) {
-    new ApplyClassStatusTask(this.plugin, event.getPlayer()).runTaskLater(this.plugin, 10);
+    new ApplyClassStatusTask(event.getPlayer()).runTaskLater(this.plugin, 10);
     ClassItemPossessed.getInstance()
         .getItems(event.getPlayer().getName())
         .forEach(itemStack -> event.getPlayer().getInventory().addItem(itemStack));
@@ -108,25 +119,27 @@ public class MineClassListeners implements Listener {
 
   private boolean isForbiddenItem(InventoryClickEvent event) {
     Player player = (Player) event.getWhoClicked();
-    if (AppliedStatus.getInstance().hasAClass(player.getName())) {
+    Optional<MineClass> mineClass = MineClassFactory.getInstance().getRightClass(player);
+    if (mineClass.isPresent() && AppliedStatus.getInstance().hasAClass(player.getName())) {
       if (event.getCurrentItem() != null
-          && ClassWrapper.isItemForbidden(player, event.getCurrentItem().getType())) {
+          && mineClass.get().isItemForbidden(event.getCurrentItem().getType())) {
         return true;
       }
       return event.getCursor() != null
-          && ClassWrapper.isItemForbidden(player, event.getCursor().getType());
+          && mineClass.get().isItemForbidden(event.getCursor().getType());
     }
     return false;
   }
 
   private void enchantItem(InventoryClickEvent event) {
     Player player = (Player) event.getWhoClicked();
-    if (AppliedStatus.getInstance().hasAClass(player.getName())) {
-      if (event.getCurrentItem() != null && !ClassWrapper.isSoulBound(event.getCurrentItem())) {
-        ClassWrapper.enchantItem(player, event.getCurrentItem());
+    Optional<MineClass> mineClass = MineClassFactory.getInstance().getRightClass(player);
+    if (mineClass.isPresent() && AppliedStatus.getInstance().hasAClass(player.getName())) {
+      if (event.getCurrentItem() != null && !MineClassFactory.isSoulBound(event.getCurrentItem())) {
+        mineClass.get().enchantItem(event.getCurrentItem());
       }
-      if (event.getCursor() != null && !ClassWrapper.isSoulBound(event.getCursor())) {
-        ClassWrapper.enchantItem(player, event.getCursor());
+      if (event.getCursor() != null && !MineClassFactory.isSoulBound(event.getCursor())) {
+        mineClass.get().enchantItem(event.getCursor());
       }
     }
   }
@@ -134,18 +147,13 @@ public class MineClassListeners implements Listener {
   @EventHandler
   public void on(BlockDropItemEvent event) {
     Player player = event.getPlayer();
-    if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
+    if (AppliedStatus.getInstance().getStatus(player.getName()).equals("fire_dwarf")) {
       event
           .getItems()
           .forEach(
-              item -> {
-                ItemStack smelted =
-                    SmeltingEngine.getInstance()
-                        .smelt(player, event.getBlock().getLocation(), item.getItemStack());
-                if (smelted != null) {
-                  item.setItemStack(smelted);
-                }
-              });
+              item -> SmeltingEngine.getInstance()
+                  .smelt(player, event.getBlock().getLocation(), item.getItemStack())
+                  .ifPresent(item::setItemStack));
     }
   }
 
@@ -160,7 +168,7 @@ public class MineClassListeners implements Listener {
           ((AbstractArrow) event.getProjectile())
               .setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         }
-        if (AppliedStatus.getInstance().isFireDwarf(player.getName())) {
+        if (AppliedStatus.getInstance().getStatus(player.getName()).equals("fire_dwarf")) {
           event.getProjectile().setFireTicks(10000);
         }
       }
@@ -172,7 +180,7 @@ public class MineClassListeners implements Listener {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
       if (event.getCause().equals(EntityDamageEvent.DamageCause.FALL)
-          && AppliedStatus.getInstance().isElf(player.getName())) {
+          && AppliedStatus.getInstance().getStatus(player.getName()).equals("elf")) {
         event.setCancelled(true);
       }
     }
@@ -182,7 +190,7 @@ public class MineClassListeners implements Listener {
   public void on(FoodLevelChangeEvent event) {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
-      if (AppliedStatus.getInstance().isElf(player.getName())) {
+      if (AppliedStatus.getInstance().getStatus(player.getName()).equals("elf")) {
         event.setCancelled(true);
       }
     }

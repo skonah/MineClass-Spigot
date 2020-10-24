@@ -3,16 +3,13 @@ package net.babamod.mineclass.classes;
 import net.babamod.mineclass.utils.Pair;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FireDwarfClass {
+public class FireDwarfClass extends MineClassImpl {
 
   private static final Set<Material> forbiddenItems =
       new HashSet<Material>() {
@@ -93,37 +90,23 @@ public class FireDwarfClass {
               )
           .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-  public static boolean is(Player player) {
-    return player.getActivePotionEffects().stream()
-        .map(PotionEffect::getType)
-        .collect(Collectors.toList())
-        .containsAll(potionEffects.keySet());
+  @Override
+  public Set<Material> getForbiddenItems() {
+    return forbiddenItems;
   }
 
-  public static void reapplyEffects(Player player) {
-    potionEffects.forEach(
-        (key, value) -> {
-          if (player.hasPotionEffect(key)) {
-            player.removePotionEffect(key);
-          }
-          player.addPotionEffect(new PotionEffect(key, Integer.MAX_VALUE, value - 1, false, false));
-        });
+  @Override
+  public Map<PotionEffectType, Integer> getPotionEffects() {
+    return potionEffects;
   }
 
-  public static boolean isItemForbidden(Material type) {
-    return forbiddenItems.contains(type);
+  @Override
+  public Map<Material, List<Pair<Enchantment, Integer>>> getClassEnchantments() {
+    return classEnchantments;
   }
 
-  public static boolean isItemEnchantable(Material type) {
-    return classEnchantments.containsKey(type);
-  }
-
-  public static void enchantItem(ItemStack itemStack) {
-    classEnchantments
-        .getOrDefault(itemStack.getType(), new ArrayList<>())
-        .forEach(
-            enchantmentIntegerPair ->
-                itemStack.addUnsafeEnchantment(
-                    enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
+  @Override
+  public String getCode() {
+    return "fire_dwarf";
   }
 }
