@@ -80,7 +80,7 @@ public class EnderElfClass extends MineClassImpl {
   @Override
   public void giveItems(Player player) {
     if (!player.getInventory().contains(Material.ENDER_PEARL)) {
-      ItemStack itemStack = new ItemStack(Material.ENDER_PEARL, 1);
+      ItemStack itemStack = new ItemStack(Material.ENDER_PEARL, 2);
       enchantItem(itemStack);
       player.getInventory().addItem(itemStack);
     }

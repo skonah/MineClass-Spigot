@@ -27,7 +27,6 @@ public final class Mineclass extends JavaPlugin implements Listener {
       pluginCommand.setTabCompleter((sender, command, alias, args) -> arguments);
       pluginCommand.setExecutor(new CommandClass());
     }
-    System.out.println(Bukkit.getOnlinePlayers());
     Bukkit.getOnlinePlayers()
         .forEach(
             player ->
