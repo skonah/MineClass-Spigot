@@ -3,24 +3,28 @@ package net.babamod.mineclass.listeners;
 import net.babamod.mineclass.Mineclass;
 import net.babamod.mineclass.classes.MineClass;
 import net.babamod.mineclass.classes.MineClassFactory;
-import net.babamod.mineclass.utils.AppliedStatus;
-import net.babamod.mineclass.utils.ApplyClassStatusTask;
-import net.babamod.mineclass.utils.ClassItemPossessed;
-import net.babamod.mineclass.utils.SmeltingEngine;
+import net.babamod.mineclass.utils.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,8 +45,7 @@ public class MineClassListeners implements Listener {
     Optional<MineClass> mineClass = MineClassFactory.getInstance().getRightClass(player);
     if (mineClass.isPresent()) {
       mineClass.get().reapplyEffects(player);
-      player.sendMessage(
-          String.format("Reminder : You are a %s.", mineClass.get().getCode()));
+      player.sendMessage(String.format("Reminder : You are a %s.", mineClass.get().getCode()));
     } else {
       player.sendMessage(
           "Hello ! The amazing MineClass mod is available on this server ! You can pick a class with the /class command.");
@@ -52,9 +55,7 @@ public class MineClassListeners implements Listener {
   @EventHandler
   public void on(PlayerItemConsumeEvent event) {
     if (event.getItem().getType().equals(Material.MILK_BUCKET)) {
-      if (AppliedStatus.getInstance().hasAClass(event.getPlayer().getName())) {
-        new ApplyClassStatusTask(event.getPlayer()).runTaskLater(this.plugin, 10);
-      }
+      new ApplyClassStatusTask(event.getPlayer()).runTaskLater(this.plugin, 10);
     }
   }
 
@@ -67,9 +68,7 @@ public class MineClassListeners implements Listener {
         if (mineClass.get().isItemForbidden(event.getItem().getItemStack().getType())) {
           event.setCancelled(true);
         }
-        if (mineClass.get().isItemEnchantable(event.getItem().getItemStack().getType())) {
-          mineClass.get().enchantItem(event.getItem().getItemStack());
-        }
+        mineClass.get().enchantItem(event.getItem().getItemStack());
       }
     }
   }
@@ -120,7 +119,7 @@ public class MineClassListeners implements Listener {
   private boolean isForbiddenItem(InventoryClickEvent event) {
     Player player = (Player) event.getWhoClicked();
     Optional<MineClass> mineClass = MineClassFactory.getInstance().getRightClass(player);
-    if (mineClass.isPresent() && AppliedStatus.getInstance().hasAClass(player.getName())) {
+    if (mineClass.isPresent()) {
       if (event.getCurrentItem() != null
           && mineClass.get().isItemForbidden(event.getCurrentItem().getType())) {
         return true;
@@ -134,7 +133,7 @@ public class MineClassListeners implements Listener {
   private void enchantItem(InventoryClickEvent event) {
     Player player = (Player) event.getWhoClicked();
     Optional<MineClass> mineClass = MineClassFactory.getInstance().getRightClass(player);
-    if (mineClass.isPresent() && AppliedStatus.getInstance().hasAClass(player.getName())) {
+    if (mineClass.isPresent()) {
       if (event.getCurrentItem() != null && !MineClassFactory.isSoulBound(event.getCurrentItem())) {
         mineClass.get().enchantItem(event.getCurrentItem());
       }
@@ -151,9 +150,10 @@ public class MineClassListeners implements Listener {
       event
           .getItems()
           .forEach(
-              item -> SmeltingEngine.getInstance()
-                  .smelt(player, event.getBlock().getLocation(), item.getItemStack())
-                  .ifPresent(item::setItemStack));
+              item ->
+                  SmeltingEngine.getInstance()
+                      .smelt(player, event.getBlock().getLocation(), item.getItemStack())
+                      .ifPresent(item::setItemStack));
     }
   }
 
@@ -180,7 +180,8 @@ public class MineClassListeners implements Listener {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
       if (event.getCause().equals(EntityDamageEvent.DamageCause.FALL)
-          && AppliedStatus.getInstance().getStatus(player.getName()).equals("elf")) {
+          && (AppliedStatus.getInstance().getStatus(player.getName()).equals("elf")
+              || AppliedStatus.getInstance().getStatus(player.getName()).equals("ender_elf"))) {
         event.setCancelled(true);
       }
     }
@@ -193,6 +194,57 @@ public class MineClassListeners implements Listener {
       if (AppliedStatus.getInstance().getStatus(player.getName()).equals("elf")) {
         event.setCancelled(true);
       }
+    }
+  }
+
+  @EventHandler
+  public void on(EntityDamageByEntityEvent event) {
+    if (event.getDamager() instanceof Player) {
+      Player player = (Player) event.getDamager();
+      if (AppliedStatus.getInstance().getStatus(player.getName()).equals("ender_elf")
+          && player.getInventory().getItemInMainHand().getType().equals(Material.ENDER_PEARL)) {
+        PlayerHitCounter.getInstance().increaseHitCount(player);
+        if (player.getAttackCooldown() == 1) {
+          // Vampirisme
+          if (player.getHealth() <= 19) {
+            player.setHealth(player.getHealth() + 1);
+          }
+        }
+        if (PlayerHitCounter.getInstance().getHitCounter(player) == 15) {
+          // Absorption
+          PlayerHitCounter.getInstance().resetHitCounter(player);
+          PotionEffect absorption =
+              new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 0);
+          player.removePotionEffect(PotionEffectType.ABSORPTION);
+          player.addPotionEffect(absorption);
+        }
+        // Damage
+        event.setDamage(event.getDamage() * (player.getAttackCooldown() * 10));
+      }
+    }
+  }
+
+  @EventHandler
+  public void on(PlayerInteractEvent event) {
+    Player player = event.getPlayer();
+    if (AppliedStatus.getInstance().getStatus(player.getName()).equals("ender_elf")
+        && event.getItem() != null
+        && event.getItem().getType().equals(Material.ENDER_PEARL)) {
+      if (event.getAction().equals(Action.RIGHT_CLICK_AIR)
+          || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+        if (!PlayerLaunchedEnderPearl.getInstance().getCooldown(player)) {
+          PlayerLaunchedEnderPearl.getInstance().setCooldown(player, this.plugin);
+          player.launchProjectile(EnderPearl.class);
+        }
+        event.setCancelled(true);
+      }
+    }
+  }
+
+  @EventHandler
+  public void on(CreatureSpawnEvent event) {
+    if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.ENDER_PEARL)) {
+      event.setCancelled(true);
     }
   }
 }

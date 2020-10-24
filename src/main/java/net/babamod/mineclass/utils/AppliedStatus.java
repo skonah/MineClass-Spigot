@@ -32,10 +32,6 @@ public class AppliedStatus implements Serializable {
     return appliedStatus.getOrDefault(playerName, "none");
   }
 
-  public synchronized boolean hasAClass(String playerName) {
-    return appliedStatus.getOrDefault(playerName, null) != null;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

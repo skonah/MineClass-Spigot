@@ -18,6 +18,7 @@ public class MineClassFactory {
     availableClasses.put("dwarf", new DwarfClass());
     availableClasses.put("elf", new ElfClass());
     availableClasses.put("fire_dwarf", new FireDwarfClass());
+    availableClasses.put("ender_elf", new EnderElfClass());
   }
 
   /** Point d'accès pour l'instance unique du singleton */
@@ -27,10 +28,6 @@ public class MineClassFactory {
     }
 
     return INSTANCE;
-  }
-
-  public synchronized Collection<MineClass> getAvailableClasses() {
-    return availableClasses.values();
   }
 
   public synchronized Set<String> getAvailableClassCodes() {

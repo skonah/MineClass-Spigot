@@ -1,5 +1,6 @@
 package net.babamod.mineclass.classes;
 
+import net.babamod.mineclass.utils.AppliedStatus;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +30,7 @@ public abstract class MineClassImpl implements MineClass {
               player.addPotionEffect(
                   new PotionEffect(key, Integer.MAX_VALUE, value - 1, false, false));
             });
+    AppliedStatus.getInstance().setStatus(player.getName(), getCode());
   }
 
   @Override
@@ -37,18 +39,15 @@ public abstract class MineClassImpl implements MineClass {
   }
 
   @Override
-  public boolean isItemEnchantable(Material type) {
-    return getClassEnchantments().containsKey(type);
-  }
-
-  @Override
   public void enchantItem(ItemStack itemStack) {
-    getClassEnchantments()
-        .getOrDefault(itemStack.getType(), new ArrayList<>())
-        .forEach(
-            enchantmentIntegerPair ->
-                itemStack.addUnsafeEnchantment(
-                    enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
-    MineClassFactory.setUnbreakableAndSoulbound(itemStack);
+    if (getClassEnchantments().containsKey(itemStack.getType())) {
+      getClassEnchantments()
+          .getOrDefault(itemStack.getType(), new ArrayList<>())
+          .forEach(
+              enchantmentIntegerPair ->
+                  itemStack.addUnsafeEnchantment(
+                      enchantmentIntegerPair.getFirst(), enchantmentIntegerPair.getSecond()));
+      MineClassFactory.setUnbreakableAndSoulbound(itemStack);
+    }
   }
 }

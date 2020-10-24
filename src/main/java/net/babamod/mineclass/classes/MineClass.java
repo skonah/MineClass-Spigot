@@ -25,8 +25,6 @@ public interface MineClass {
 
   boolean isItemForbidden(Material type);
 
-  boolean isItemEnchantable(Material type);
-
   void enchantItem(ItemStack itemStack);
 
   String getCode();
