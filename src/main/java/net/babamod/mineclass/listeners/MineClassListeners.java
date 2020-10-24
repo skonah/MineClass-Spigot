@@ -223,28 +223,22 @@ public class MineClassListeners implements Listener {
   }
 
   @EventHandler
-  public void on(PlayerInteractEvent event) {
-    Player player = event.getPlayer();
-    if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
-        && event.getItem() != null
-        && event.getItem().getType().equals(Material.ENDER_PEARL)) {
-      if ((event.getAction().equals(Action.RIGHT_CLICK_AIR)
-              || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
-          && (event.getClickedBlock() == null
-              || !event.getClickedBlock().getType().isInteractable())) {
-        if (!PlayerLaunchedEnderPearl.getInstance().getCooldown(player)) {
-          PlayerLaunchedEnderPearl.getInstance().setCooldown(player, this.plugin);
-          player.launchProjectile(EnderPearl.class);
-        }
-        event.setCancelled(true);
-      }
+  public void on(CreatureSpawnEvent event) {
+    if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.ENDER_PEARL)) {
+      event.setCancelled(true);
     }
   }
 
   @EventHandler
-  public void on(CreatureSpawnEvent event) {
-    if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.ENDER_PEARL)) {
-      event.setCancelled(true);
+  public void on(ProjectileHitEvent event) {
+    if (event.getEntity().getShooter() instanceof Player) {
+      Player player = (Player) event.getEntity().getShooter();
+      if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
+          && event.getEntity() instanceof EnderPearl) {
+        ItemStack itemStack = new ItemStack(Material.ENDER_PEARL, 1);
+        MineClassFactory.setUnbreakableAndSoulbound(itemStack);
+        player.getInventory().addItem(itemStack);
+      }
     }
   }
 }
