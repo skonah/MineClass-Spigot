@@ -3,6 +3,8 @@ package net.babamod.mineclass.classes;
 import net.babamod.mineclass.utils.Pair;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
@@ -73,5 +75,14 @@ public class EnderElfClass extends MineClassImpl {
   @Override
   public String getCode() {
     return "ender_elf";
+  }
+
+  @Override
+  public void giveItems(Player player) {
+    if (!player.getInventory().contains(Material.ENDER_PEARL)) {
+      ItemStack itemStack = new ItemStack(Material.ENDER_PEARL, 1);
+      enchantItem(itemStack);
+      player.getInventory().addItem(itemStack);
+    }
   }
 }

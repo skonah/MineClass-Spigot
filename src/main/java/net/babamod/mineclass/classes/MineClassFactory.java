@@ -10,6 +10,7 @@ import java.util.*;
 public class MineClassFactory {
   /** Instance unique pré-initialisée */
   private static MineClassFactory INSTANCE;
+
   private final Map<String, MineClass> availableClasses;
 
   /** Constructeur privé */
@@ -30,19 +31,6 @@ public class MineClassFactory {
     return INSTANCE;
   }
 
-  public synchronized Set<String> getAvailableClassCodes() {
-    return availableClasses.keySet();
-  }
-
-  public synchronized Optional<MineClass> getRightClass(Player player) {
-    for (Map.Entry<String, MineClass> stringMineClassEntry : availableClasses.entrySet()) {
-      if (stringMineClassEntry.getValue().is(player)) {
-        return Optional.of(stringMineClassEntry.getValue());
-      }
-    }
-    return Optional.empty();
-  }
-
   public static boolean isSoulBound(ItemStack itemStack) {
     if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getLore() != null) {
       return itemStack.getItemMeta().getLore().contains("Soulbound");
@@ -58,10 +46,6 @@ public class MineClassFactory {
     }
   }
 
-  public void reapplyEffectsByCode(String code, Player player) {
-    availableClasses.get(code).reapplyEffects(player);
-  }
-
   public static void setUnbreakableAndSoulbound(ItemStack itemStack) {
     if (itemStack.getItemMeta() != null) {
       ItemMeta itemMeta = itemStack.getItemMeta();
@@ -69,5 +53,26 @@ public class MineClassFactory {
       itemMeta.setLore(Collections.singletonList("Soulbound"));
       itemStack.setItemMeta(itemMeta);
     }
+  }
+
+  public synchronized Set<String> getAvailableClassCodes() {
+    return availableClasses.keySet();
+  }
+
+  public synchronized Optional<MineClass> getRightClass(Player player) {
+    for (Map.Entry<String, MineClass> stringMineClassEntry : availableClasses.entrySet()) {
+      if (stringMineClassEntry.getValue().is(player)) {
+        return Optional.of(stringMineClassEntry.getValue());
+      }
+    }
+    return Optional.empty();
+  }
+
+  public void reapplyEffectsByCode(String code, Player player) {
+    availableClasses.get(code).reapplyEffects(player);
+  }
+
+  public void giveItemsForClassByCode(String code, Player player) {
+    availableClasses.get(code).giveItems(player);
   }
 }

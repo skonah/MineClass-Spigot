@@ -3,6 +3,7 @@ package net.babamod.mineclass.classes;
 import net.babamod.mineclass.utils.Pair;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
@@ -91,4 +92,7 @@ public class DwarfClass extends MineClassImpl {
   public String getCode() {
     return "dwarf";
   }
+
+  @Override
+  public void giveItems(Player player) {}
 }

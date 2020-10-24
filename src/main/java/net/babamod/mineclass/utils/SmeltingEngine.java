@@ -33,7 +33,8 @@ public class SmeltingEngine {
     return INSTANCE;
   }
 
-  public synchronized Optional<ItemStack> smelt(Player player, Location location, ItemStack itemStack) {
+  public synchronized Optional<ItemStack> smelt(
+      Player player, Location location, ItemStack itemStack) {
     Optional<ItemStack> result = Optional.empty();
     Iterator<Recipe> iter = Bukkit.recipeIterator();
     while (iter.hasNext()) {
@@ -54,7 +55,9 @@ public class SmeltingEngine {
         player.getWorld().spawn(location, ExperienceOrb.class).setExperience(exp);
         expModifier
             .get(player.getName())
-            .put(result.get().getType(), expModifier.get(player.getName()).get(result.get().getType()) - exp);
+            .put(
+                result.get().getType(),
+                expModifier.get(player.getName()).get(result.get().getType()) - exp);
       }
       break;
     }

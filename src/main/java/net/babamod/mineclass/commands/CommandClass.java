@@ -11,7 +11,8 @@ public class CommandClass implements CommandExecutor {
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (args.length == 0) {
-      sender.sendMessage("You need to use this command with one of the suggested arguments (press space then tab to see suggested arguments).");
+      sender.sendMessage(
+          "You need to use this command with one of the suggested arguments (press space then tab to see suggested arguments).");
       return false;
     }
     if (sender instanceof Player) {
@@ -20,6 +21,7 @@ public class CommandClass implements CommandExecutor {
         AppliedStatus.getInstance().setStatus(player.getName(), args[0]);
         MineClassFactory.clearAllClassEffects(player);
         MineClassFactory.getInstance().reapplyEffectsByCode(args[0], player);
+        MineClassFactory.getInstance().giveItemsForClassByCode(args[0], player);
         return true;
       }
       if (args[0].equals("clear")) {
@@ -29,10 +31,8 @@ public class CommandClass implements CommandExecutor {
       }
       if (args[0].equals("whoami")) {
         String classCode = AppliedStatus.getInstance().getStatus(player.getName());
-        if (!classCode.equals("none")) {
-          player.sendMessage(
-              String.format(
-                  "You are a %s.", classCode));
+        if (classCode != null && !classCode.equals("none")) {
+          player.sendMessage(String.format("You are a %s.", classCode));
         } else {
           player.sendMessage("You are a simple steve.");
         }

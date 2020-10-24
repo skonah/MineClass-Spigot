@@ -49,8 +49,6 @@ public class AppliedStatus implements Serializable {
 
   @Override
   public String toString() {
-    return "AppliedStatus{" +
-            "appliedStatus=" + appliedStatus +
-            '}';
+    return "AppliedStatus{" + "appliedStatus=" + appliedStatus + '}';
   }
 }

@@ -26,7 +26,7 @@ public class PlayerHitCounter {
 
   public synchronized void increaseHitCount(Player player) {
     Integer counter = byPlayerCounter.getOrDefault(player.getName(), 0);
-    byPlayerCounter.put(player.getName(), counter+1);
+    byPlayerCounter.put(player.getName(), counter + 1);
   }
 
   public synchronized void resetHitCounter(Player player) {

@@ -27,5 +27,7 @@ public interface MineClass {
 
   void enchantItem(ItemStack itemStack);
 
+  void giveItems(Player player);
+
   String getCode();
 }
