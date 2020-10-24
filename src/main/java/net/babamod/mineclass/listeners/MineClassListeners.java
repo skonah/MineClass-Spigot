@@ -144,7 +144,7 @@ public class MineClassListeners implements Listener {
   @EventHandler
   public void on(BlockDropItemEvent event) {
     Player player = event.getPlayer();
-    if (AppliedStatus.getInstance().getStatus(player.getName()).equals("fire_dwarf")) {
+    if (AppliedStatus.getInstance().getStatus(player).equals("fire_dwarf")) {
       event
           .getItems()
           .forEach(
@@ -166,7 +166,7 @@ public class MineClassListeners implements Listener {
           ((AbstractArrow) event.getProjectile())
               .setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         }
-        if (AppliedStatus.getInstance().getStatus(player.getName()).equals("fire_dwarf")) {
+        if (AppliedStatus.getInstance().getStatus(player).equals("fire_dwarf")) {
           event.getProjectile().setFireTicks(10000);
         }
       }
@@ -178,8 +178,8 @@ public class MineClassListeners implements Listener {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
       if (event.getCause().equals(EntityDamageEvent.DamageCause.FALL)
-          && (AppliedStatus.getInstance().getStatus(player.getName()).equals("elf")
-              || AppliedStatus.getInstance().getStatus(player.getName()).equals("ender_elf"))) {
+          && (AppliedStatus.getInstance().getStatus(player).equals("elf")
+              || AppliedStatus.getInstance().getStatus(player).equals("ender_elf"))) {
         event.setCancelled(true);
       }
     }
@@ -189,7 +189,7 @@ public class MineClassListeners implements Listener {
   public void on(FoodLevelChangeEvent event) {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
-      if (AppliedStatus.getInstance().getStatus(player.getName()).equals("elf")) {
+      if (AppliedStatus.getInstance().getStatus(player).equals("elf")) {
         event.setCancelled(true);
       }
     }
@@ -199,7 +199,7 @@ public class MineClassListeners implements Listener {
   public void on(EntityDamageByEntityEvent event) {
     if (event.getDamager() instanceof Player) {
       Player player = (Player) event.getDamager();
-      if (AppliedStatus.getInstance().getStatus(player.getName()).equals("ender_elf")
+      if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
           && player.getInventory().getItemInMainHand().getType().equals(Material.ENDER_PEARL)) {
         PlayerHitCounter.getInstance().increaseHitCount(player);
         if (player.getAttackCooldown() == 1) {
@@ -225,7 +225,7 @@ public class MineClassListeners implements Listener {
   @EventHandler
   public void on(PlayerInteractEvent event) {
     Player player = event.getPlayer();
-    if (AppliedStatus.getInstance().getStatus(player.getName()).equals("ender_elf")
+    if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
         && event.getItem() != null
         && event.getItem().getType().equals(Material.ENDER_PEARL)) {
       if (event.getAction().equals(Action.RIGHT_CLICK_AIR)

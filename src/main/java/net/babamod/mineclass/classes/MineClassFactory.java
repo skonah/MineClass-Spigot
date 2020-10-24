@@ -1,5 +1,6 @@
 package net.babamod.mineclass.classes;
 
+import net.babamod.mineclass.utils.AppliedStatus;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -61,7 +62,8 @@ public class MineClassFactory {
 
   public synchronized Optional<MineClass> getRightClass(Player player) {
     for (Map.Entry<String, MineClass> stringMineClassEntry : availableClasses.entrySet()) {
-      if (stringMineClassEntry.getValue().is(player)) {
+      if (AppliedStatus.getInstance().getStatus(player).equals(stringMineClassEntry.getKey())
+          || stringMineClassEntry.getValue().is(player)) {
         return Optional.of(stringMineClassEntry.getValue());
       }
     }

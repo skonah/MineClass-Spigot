@@ -1,5 +1,7 @@
 package net.babamod.mineclass.utils;
 
+import org.bukkit.entity.Player;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
@@ -24,12 +26,16 @@ public class AppliedStatus implements Serializable {
     return INSTANCE;
   }
 
-  public synchronized void setStatus(String playerName, String status) {
-    appliedStatus.put(playerName, status);
+  public synchronized void setStatus(Player player, String status) {
+    appliedStatus.put(player.getName(), status);
   }
 
-  public synchronized String getStatus(String playerName) {
-    return appliedStatus.getOrDefault(playerName, "none");
+  public synchronized String getStatus(Player player) {
+    return appliedStatus.getOrDefault(player.getName(), "none");
+  }
+
+  public synchronized boolean hasClass(Player player) {
+    return appliedStatus.get(player.getName()) != null;
   }
 
   @Override

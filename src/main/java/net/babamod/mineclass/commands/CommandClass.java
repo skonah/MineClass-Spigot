@@ -18,19 +18,19 @@ public class CommandClass implements CommandExecutor {
     if (sender instanceof Player) {
       Player player = (Player) sender;
       if (MineClassFactory.getInstance().getAvailableClassCodes().contains(args[0])) {
-        AppliedStatus.getInstance().setStatus(player.getName(), args[0]);
+        AppliedStatus.getInstance().setStatus(player, args[0]);
         MineClassFactory.clearAllClassEffects(player);
         MineClassFactory.getInstance().reapplyEffectsByCode(args[0], player);
         MineClassFactory.getInstance().giveItemsForClassByCode(args[0], player);
         return true;
       }
       if (args[0].equals("clear")) {
-        AppliedStatus.getInstance().setStatus(player.getName(), null);
+        AppliedStatus.getInstance().setStatus(player, null);
         MineClassFactory.clearAllClassEffects(player);
         return true;
       }
       if (args[0].equals("whoami")) {
-        String classCode = AppliedStatus.getInstance().getStatus(player.getName());
+        String classCode = AppliedStatus.getInstance().getStatus(player);
         if (classCode != null && !classCode.equals("none")) {
           player.sendMessage(String.format("You are a %s.", classCode));
         } else {

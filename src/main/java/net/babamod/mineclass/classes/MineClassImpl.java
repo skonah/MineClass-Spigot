@@ -30,7 +30,7 @@ public abstract class MineClassImpl implements MineClass {
               player.addPotionEffect(
                   new PotionEffect(key, Integer.MAX_VALUE, value - 1, false, false));
             });
-    AppliedStatus.getInstance().setStatus(player.getName(), getCode());
+    AppliedStatus.getInstance().setStatus(player, getCode());
   }
 
   @Override
