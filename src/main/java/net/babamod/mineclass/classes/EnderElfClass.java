@@ -2,9 +2,11 @@ package net.babamod.mineclass.classes;
 
 import net.babamod.mineclass.utils.Pair;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
@@ -45,7 +47,6 @@ public class EnderElfClass extends MineClassImpl {
   private static final Map<PotionEffectType, Integer> potionEffects =
       Stream.of(
               new Object[][] {
-                {PotionEffectType.HUNGER, 10},
                 {PotionEffectType.NIGHT_VISION, 1},
                 {PotionEffectType.ABSORPTION, 1},
               })
@@ -75,6 +76,16 @@ public class EnderElfClass extends MineClassImpl {
   @Override
   public String getCode() {
     return "ender_elf";
+  }
+
+  @Override
+  public void reapplyEffects(Player player) {
+    super.reapplyEffects(player);
+    if (player.getWorld().getEnvironment().equals(World.Environment.THE_END)) {
+      PotionEffect saturation =
+          new PotionEffect(PotionEffectType.SATURATION, Integer.MAX_VALUE, 9, false, false);
+      player.addPotionEffect(saturation);
+    }
   }
 
   @Override

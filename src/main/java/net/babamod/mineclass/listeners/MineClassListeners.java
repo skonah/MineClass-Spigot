@@ -4,6 +4,7 @@ import net.babamod.mineclass.Mineclass;
 import net.babamod.mineclass.classes.MineClass;
 import net.babamod.mineclass.classes.MineClassFactory;
 import net.babamod.mineclass.utils.*;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
@@ -11,12 +12,11 @@ import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -192,6 +192,12 @@ public class MineClassListeners implements Listener {
       if (AppliedStatus.getInstance().getStatus(player).equals("elf")) {
         event.setCancelled(true);
       }
+      if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")) {
+        int difference = player.getFoodLevel() - event.getFoodLevel();
+        if (difference > 0) {
+          event.setFoodLevel(player.getFoodLevel() - (difference * 2));
+        }
+      }
     }
   }
 
@@ -233,6 +239,9 @@ public class MineClassListeners implements Listener {
   public void on(ProjectileHitEvent event) {
     if (event.getEntity().getShooter() instanceof Player) {
       Player player = (Player) event.getEntity().getShooter();
+      if (player.getGameMode().equals(GameMode.CREATIVE)) {
+        return;
+      }
       if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
           && event.getEntity() instanceof EnderPearl) {
         ItemStack itemStack = new ItemStack(Material.ENDER_PEARL, 1);
@@ -240,5 +249,13 @@ public class MineClassListeners implements Listener {
         player.getInventory().addItem(itemStack);
       }
     }
+  }
+
+  @EventHandler
+  public void on(PlayerChangedWorldEvent event) {
+    Player player = event.getPlayer();
+    MineClassFactory.getInstance()
+        .getRightClass(player)
+        .ifPresent(mineClass -> mineClass.reapplyEffects(player));
   }
 }

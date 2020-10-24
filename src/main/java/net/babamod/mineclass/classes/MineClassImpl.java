@@ -21,6 +21,7 @@ public abstract class MineClassImpl implements MineClass {
 
   @Override
   public void reapplyEffects(Player player) {
+    MineClassFactory.clearAllClassEffects(player);
     getPotionEffects()
         .forEach(
             (key, value) -> {
