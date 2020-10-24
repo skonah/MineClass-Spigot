@@ -212,7 +212,7 @@ public class MineClassListeners implements Listener {
           // Absorption
           PlayerHitCounter.getInstance().resetHitCounter(player);
           PotionEffect absorption =
-              new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 0);
+              new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 0, false, false);
           player.removePotionEffect(PotionEffectType.ABSORPTION);
           player.addPotionEffect(absorption);
         }
@@ -228,8 +228,10 @@ public class MineClassListeners implements Listener {
     if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
         && event.getItem() != null
         && event.getItem().getType().equals(Material.ENDER_PEARL)) {
-      if (event.getAction().equals(Action.RIGHT_CLICK_AIR)
-          || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+      if ((event.getAction().equals(Action.RIGHT_CLICK_AIR)
+              || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
+          && (event.getClickedBlock() == null
+              || !event.getClickedBlock().getType().isInteractable())) {
         if (!PlayerLaunchedEnderPearl.getInstance().getCooldown(player)) {
           PlayerLaunchedEnderPearl.getInstance().setCooldown(player, this.plugin);
           player.launchProjectile(EnderPearl.class);
