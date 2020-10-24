@@ -14,7 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -92,20 +91,7 @@ public class MineClassListeners implements Listener {
 
   @EventHandler
   public void on(InventoryClickEvent event) {
-    if ((event.getAction().equals(InventoryAction.PICKUP_ALL)
-            || event.getAction().equals(InventoryAction.PICKUP_HALF)
-            || event.getAction().equals(InventoryAction.PICKUP_ONE)
-            || event.getAction().equals(InventoryAction.PICKUP_SOME))
-        && event.getWhoClicked() instanceof Player) {
-      if (isForbiddenItem(event)) {
-        event.setCancelled(true);
-        return;
-      }
-      enchantItem(event);
-    }
-
-    if ((event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))
-        && event.getWhoClicked() instanceof Player) {
+    if (event.getWhoClicked() instanceof Player) {
       if (isForbiddenItem(event)) {
         event.setCancelled(true);
         return;
@@ -144,7 +130,8 @@ public class MineClassListeners implements Listener {
   @EventHandler
   public void on(BlockDropItemEvent event) {
     Player player = event.getPlayer();
-    if (AppliedStatus.getInstance().getStatus(player).equals("fire_dwarf")) {
+    if (AppliedStatus.getInstance().getStatus(player) != null
+        && AppliedStatus.getInstance().getStatus(player).equals("fire_dwarf")) {
       event
           .getItems()
           .forEach(
@@ -166,7 +153,8 @@ public class MineClassListeners implements Listener {
           ((AbstractArrow) event.getProjectile())
               .setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         }
-        if (AppliedStatus.getInstance().getStatus(player).equals("fire_dwarf")) {
+        if (AppliedStatus.getInstance().getStatus(player) != null
+            && AppliedStatus.getInstance().getStatus(player).equals("fire_dwarf")) {
           event.getProjectile().setFireTicks(10000);
         }
       }
@@ -178,6 +166,7 @@ public class MineClassListeners implements Listener {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
       if (event.getCause().equals(EntityDamageEvent.DamageCause.FALL)
+          && AppliedStatus.getInstance().getStatus(player) != null
           && (AppliedStatus.getInstance().getStatus(player).equals("elf")
               || AppliedStatus.getInstance().getStatus(player).equals("ender_elf"))) {
         event.setCancelled(true);
@@ -189,10 +178,12 @@ public class MineClassListeners implements Listener {
   public void on(FoodLevelChangeEvent event) {
     if (event.getEntity() instanceof Player) {
       Player player = (Player) event.getEntity();
-      if (AppliedStatus.getInstance().getStatus(player).equals("elf")) {
+      if (AppliedStatus.getInstance().getStatus(player) != null
+          && AppliedStatus.getInstance().getStatus(player).equals("elf")) {
         event.setCancelled(true);
       }
-      if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")) {
+      if (AppliedStatus.getInstance().getStatus(player) != null
+          && AppliedStatus.getInstance().getStatus(player).equals("ender_elf")) {
         int difference = player.getFoodLevel() - event.getFoodLevel();
         if (difference > 0) {
           event.setFoodLevel(player.getFoodLevel() - (difference * 2));
@@ -205,7 +196,8 @@ public class MineClassListeners implements Listener {
   public void on(EntityDamageByEntityEvent event) {
     if (event.getDamager() instanceof Player) {
       Player player = (Player) event.getDamager();
-      if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
+      if (AppliedStatus.getInstance().getStatus(player) != null
+          && AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
           && player.getInventory().getItemInMainHand().getType().equals(Material.ENDER_PEARL)) {
         PlayerHitCounter.getInstance().increaseHitCount(player);
         if (player.getAttackCooldown() == 1) {
@@ -242,7 +234,8 @@ public class MineClassListeners implements Listener {
       if (player.getGameMode().equals(GameMode.CREATIVE)) {
         return;
       }
-      if (AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
+      if (AppliedStatus.getInstance().getStatus(player) != null
+          && AppliedStatus.getInstance().getStatus(player).equals("ender_elf")
           && event.getEntity() instanceof EnderPearl) {
         ItemStack itemStack = new ItemStack(Material.ENDER_PEARL, 1);
         MineClassFactory.setUnbreakableAndSoulbound(itemStack);

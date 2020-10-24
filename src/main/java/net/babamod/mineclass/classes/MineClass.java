@@ -30,4 +30,6 @@ public interface MineClass {
   void giveItems(Player player);
 
   String getCode();
+
+  void dropForbiddenItems(Player player);
 }

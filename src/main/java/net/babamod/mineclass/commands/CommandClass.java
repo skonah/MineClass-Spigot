@@ -22,6 +22,7 @@ public class CommandClass implements CommandExecutor {
         MineClassFactory.clearAllClassEffects(player);
         MineClassFactory.getInstance().reapplyEffectsByCode(args[0], player);
         MineClassFactory.getInstance().giveItemsForClassByCode(args[0], player);
+        MineClassFactory.getInstance().dropForbiddenItemsForClassByCode(args[0], player);
         return true;
       }
       if (args[0].equals("clear")) {

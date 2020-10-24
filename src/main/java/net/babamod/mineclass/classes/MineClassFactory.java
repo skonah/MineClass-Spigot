@@ -62,7 +62,8 @@ public class MineClassFactory {
 
   public synchronized Optional<MineClass> getRightClass(Player player) {
     for (Map.Entry<String, MineClass> stringMineClassEntry : availableClasses.entrySet()) {
-      if (AppliedStatus.getInstance().getStatus(player).equals(stringMineClassEntry.getKey())
+      if (AppliedStatus.getInstance().getStatus(player) != null
+              && AppliedStatus.getInstance().getStatus(player).equals(stringMineClassEntry.getKey())
           || stringMineClassEntry.getValue().is(player)) {
         return Optional.of(stringMineClassEntry.getValue());
       }
@@ -76,5 +77,9 @@ public class MineClassFactory {
 
   public void giveItemsForClassByCode(String code, Player player) {
     availableClasses.get(code).giveItems(player);
+  }
+
+  public void dropForbiddenItemsForClassByCode(String code, Player player) {
+    availableClasses.get(code).dropForbiddenItems(player);
   }
 }

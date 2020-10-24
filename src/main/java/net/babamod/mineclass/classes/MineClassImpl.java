@@ -51,4 +51,14 @@ public abstract class MineClassImpl implements MineClass {
       MineClassFactory.setUnbreakableAndSoulbound(itemStack);
     }
   }
+
+  @Override
+  public void dropForbiddenItems(Player player) {
+    for (ItemStack content : player.getInventory().getContents()) {
+      if (content != null && getForbiddenItems().contains(content.getType())) {
+        player.getInventory().remove(content);
+        player.getWorld().dropItemNaturally(player.getLocation(), content);
+      }
+    }
+  }
 }
